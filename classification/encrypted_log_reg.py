@@ -4,9 +4,10 @@ https://github.com/OpenMined/TenSEAL/blob/main/tutorials%2FTutorial%201%20-%20Tr
 '''
 import torch 
 import tenseal as ts
+import time
 
 
-class EncryptedLR:
+class EncryptedLogReg:
     def __init__(self, n_features):
         self.weight = [0.0] * n_features
         self.bias = [0.0]
@@ -18,7 +19,7 @@ class EncryptedLR:
 
     def forward(self, enc_x):
         enc_out = enc_x.dot(self.weight) + self.bias
-        enc_out = EncryptedLR.sigmoid(enc_out)
+        enc_out = EncryptedLogReg.sigmoid(enc_out)
         return enc_out
 
     def backward(self, enc_x, enc_out, enc_y):
@@ -67,3 +68,25 @@ class EncryptedLR:
 
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)
+
+
+def train_encrypted_log_reg(model, ctx_training, enc_x_train, enc_y_train, x_test, y_test, epochs=5):
+    times = []
+    for epoch in range(epochs):
+        model.encrypt(ctx_training)
+
+        t_start = time.time()
+        for enc_x, enc_y in zip(enc_x_train, enc_y_train):
+            enc_out = model.forward(enc_x)
+            model.backward(enc_x, enc_out, enc_y)
+        model.update_parameters()
+        t_end = time.time()
+        times.append(t_end - t_start)
+
+        model.decrypt()
+        accuracy = model.plain_accuracy(x_test, y_test)
+        print(f"Accuracy at epoch #{epoch + 1} is {accuracy}")
+
+
+    print(f"\nAverage time per epoch: {int(sum(times) / len(times))} seconds")
+    print(f"Final accuracy is {accuracy}")
