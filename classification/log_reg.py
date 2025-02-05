@@ -2,6 +2,7 @@ import time
 
 import torch
 
+torch.random.manual_seed(99)
 
 class LogReg(torch.nn.Module):
 

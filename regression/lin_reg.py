@@ -2,6 +2,7 @@ import time
 
 import torch
 
+torch.random.manual_seed(66)
 
 class LinReg(torch.nn.Module):
 

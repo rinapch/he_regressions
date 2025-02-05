@@ -8,6 +8,8 @@ import time
 import tenseal as ts
 import torch
 
+torch.random.manual_seed(40)
+
 
 class EncryptedLogReg:
     def __init__(self, n_features):
@@ -92,4 +94,3 @@ def train_encrypted_log_reg(
         print(f"Accuracy at epoch #{epoch + 1} is {accuracy}")
 
     print(f"\nAverage time per epoch: {int(sum(times) / len(times))} seconds")
-    print(f"Final accuracy is {accuracy}")

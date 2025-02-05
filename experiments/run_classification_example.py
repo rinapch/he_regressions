@@ -42,5 +42,5 @@ def run_experiment(normalization_type):
 
 
 if __name__ == "__main__":
-    for normalization_type in [None, "z-score", "min-max"]:
+    for normalization_type in ["min-max"]:
         run_experiment(normalization_type)

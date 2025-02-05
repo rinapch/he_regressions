@@ -4,6 +4,7 @@ import numpy as np
 import tenseal as ts
 import torch
 
+torch.random.manual_seed(40)
 
 class EncryptedLinearRegression:
     def __init__(self, n_features):

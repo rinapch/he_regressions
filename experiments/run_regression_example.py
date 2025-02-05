@@ -7,6 +7,7 @@ from regression import (EncryptedLinearRegression, LinReg,
                         train_encrypted_linear_reg, train_linear_reg)
 
 
+
 def run_experiment(normalization_type):
     x_train, y_train, x_test, y_test = get_financial_data(
         standardization=normalization_type
