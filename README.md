@@ -53,7 +53,7 @@ Metrics are the best results obtained during training.
 
 ### Min-max normalization:
 | Model    | Metric | Speed |
-| -------- | ------- |
+| -------- | ------- | ------- |
 | LogReg  | 0.60 | 0.1 |
 | EncLogReg | 0.60 | 133 |
 | LinReg    | 0.77 | 0.1|
