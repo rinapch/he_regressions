@@ -1,7 +1,7 @@
 import torch 
 import tenseal as ts
 import numpy as np
- 
+import time 
  
 class EncryptedLinearRegression:
     def __init__(self, n_features):
@@ -39,7 +39,7 @@ class EncryptedLinearRegression:
         self._delta_b += error
         self._count += 1
 
-    def update_parameters(self, lr=0.01, l2_reg=0.0):
+    def update_parameters(self, lr=0.001, l2_reg=0.01):
         """
         Update parameters using the accumulated gradients.
         lr: Learning rate
@@ -101,3 +101,59 @@ class EncryptedLinearRegression:
             model(enc_x)
         """
         return self.forward(*args, **kwargs)
+    
+
+def train_encrypted_linear_reg(
+    model,
+    ctx_training,
+    enc_x_train,
+    enc_y_train,
+    x_test,
+    y_test,
+    lr=0.001,
+    epochs=5,
+    batch_size=100
+):
+    times = []
+    n_samples = len(enc_x_train)
+
+    for epoch in range(epochs):
+        # Encrypt fresh each epoch if needed 
+        # (often you might just keep your model encrypted throughout,
+        #  but here's a place to ensure encryption is set)
+        model.encrypt(ctx_training)
+
+        # Time the epoch
+        t_start = time.time()
+        
+        # Shuffle data if you like (optional)
+        # (requires storing them together or using the same shuffled indices)
+        # For simplicity here, we won't shuffle
+
+        # Process each mini-batch
+        for i in range(0, n_samples, batch_size):
+            x_batch = enc_x_train[i : i + batch_size]
+            y_batch = enc_y_train[i : i + batch_size]
+
+            # 1) Accumulate gradients over the batch
+            for enc_x, enc_y in zip(x_batch, y_batch):
+                enc_out = model.forward(enc_x)
+                model.backward(enc_x, enc_out, enc_y)
+
+            # 2) Now update once using the accumulated gradients
+            model.update_parameters(lr=lr, l2_reg=0.001)
+
+        # End-of-epoch time
+        t_end = time.time()
+        epoch_time = t_end - t_start
+        times.append(epoch_time)
+
+        # Decrypt temporarily to compute plain MSE (or you could keep it encrypted if you have a different approach)
+        model.decrypt()
+        current_mse = model.plain_mse(x_test, y_test)
+        print(f"[Epoch {epoch + 1}] MSE: {current_mse:.4f} | Time: {epoch_time:.2f} s")
+
+    average_time_per_epoch = sum(times) / len(times)
+    print(f"\nAverage time per epoch: {average_time_per_epoch:.2f} seconds")
+    final_mse = model.plain_mse(x_test, y_test)
+    print(f"Final MSE after training: {final_mse:.4f}")

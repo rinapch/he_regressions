@@ -2,6 +2,11 @@ import pandas as pd
 import torch 
 from sklearn.preprocessing import LabelEncoder
 import random
+import yfinance as yf
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
 
 def split_train_test(x, y, test_ratio=0.3):
     idxs = [i for i in range(len(x))]
@@ -41,3 +46,45 @@ def get_hospital_data(standatrization=None):
     
     x = torch.tensor(data.values).float()
     return split_train_test(x, y)
+
+
+def get_financial_data(lookback_years=1, standardization=None):
+    tech_list = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
+    all_data = []
+    for ticker in tech_list:
+        stock = yf.Ticker(ticker)
+        stock_info = stock.history(period="2mo")  # Fetching 1 year of historical data
+        stock_info['Ticker'] = ticker  # Add ticker column
+        all_data.append(stock_info)
+    
+    # Concatenating all DataFrames
+    full_df = pd.concat(all_data, axis=0)
+    full_df['Ticker'] = full_df['Ticker'].astype('category').cat.codes  
+    full_df = full_df.dropna()
+    full_df = full_df.reset_index()
+    #print(full_df.head())
+
+    X = full_df.drop(columns=['Close', 'Date', 'Volume', 'Stock Splits'], axis=1)
+    X = scaler.fit_transform(X)
+
+    #print(X.head())
+    y = pd.DataFrame(full_df['Close'])
+    y = scaler.fit_transform(y)
+
+    # Apply standardization if specified
+    if standardization == "z-score":
+        X = (X - X.mean()) / X.std()
+    elif standardization == "min-max":
+        X = (X - X.min()) / (X.max() - X.min())
+    elif standardization is not None:
+        raise ValueError(f"Unknown standardization method: {standardization}")
+    
+    # Convert to tensors
+    X = torch.tensor(X).float()
+    #print(X[0])
+    y = torch.tensor(y).float()
+    #print(y)
+    
+    # Split into train and test sets
+    return split_train_test(X, y)
+
