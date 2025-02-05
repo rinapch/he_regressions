@@ -1,5 +1,6 @@
+import time
+
 import torch
-import time 
 
 
 class LogReg(torch.nn.Module):
@@ -11,7 +12,7 @@ class LogReg(torch.nn.Module):
     def forward(self, x):
         out = torch.sigmoid(self.lr(x))
         return out
-    
+
     def accuracy(self, x, y):
         out = self.forward(x)
         correct = torch.abs(y - out) < 0.5

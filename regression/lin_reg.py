@@ -1,5 +1,6 @@
-import torch 
-import time 
+import time
+
+import torch
 
 
 class LinReg(torch.nn.Module):
@@ -9,9 +10,10 @@ class LinReg(torch.nn.Module):
         self.lr = torch.nn.Linear(n_features, 1)
 
     def forward(self, x):
-      out = self.lr(x) 
-      return out
-    
+        out = self.lr(x)
+        return out
+
+
 def train_linear_reg(model, x_train, y_train, x_test, y_test, lr=0.001, epochs=5):
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     loss_fn = torch.nn.MSELoss()
@@ -29,4 +31,3 @@ def train_linear_reg(model, x_train, y_train, x_test, y_test, lr=0.001, epochs=5
 
     print(f"\nAverage time per epoch: {int(sum(times) / len(times))} seconds")
     print(f"Final MSE is {loss_fn(model(x_test), y_test).item()}")
-

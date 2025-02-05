@@ -1,8 +1,10 @@
-import torch 
-import tenseal as ts
+import time
+
 import numpy as np
-import time 
- 
+import tenseal as ts
+import torch
+
+
 class EncryptedLinearRegression:
     def __init__(self, n_features):
         """
@@ -10,7 +12,7 @@ class EncryptedLinearRegression:
         Creates zero weight and bias as Python lists (for later encryption).
         """
         # Get number of features from the model shape
-        
+
         # Initialize zero weights and bias
         self.weight = [0.0] * n_features
         self.bias = [0.0]
@@ -55,10 +57,14 @@ class EncryptedLinearRegression:
         # Apply L2 regularization to weights
         # E.g., dW = dW + lambda * W
         if l2_reg > 0.0:
-            avg_dW += [w * l2_reg for w in self.weight] if not isinstance(self.weight, ts.CKKSVector) else self.weight * l2_reg
+            avg_dW += (
+                [w * l2_reg for w in self.weight]
+                if not isinstance(self.weight, ts.CKKSVector)
+                else self.weight * l2_reg
+            )
 
         # Perform the gradient update step
-        # If self.weight is encrypted, we do homomorphic updates; 
+        # If self.weight is encrypted, we do homomorphic updates;
         # if self.weight is plain, these operations will be normal float ops.
         self.weight -= avg_dW * lr
         self.bias -= avg_dB * lr
@@ -101,7 +107,7 @@ class EncryptedLinearRegression:
             model(enc_x)
         """
         return self.forward(*args, **kwargs)
-    
+
 
 def train_encrypted_linear_reg(
     model,
@@ -112,20 +118,20 @@ def train_encrypted_linear_reg(
     y_test,
     lr=0.001,
     epochs=5,
-    batch_size=100
+    batch_size=100,
 ):
     times = []
     n_samples = len(enc_x_train)
 
     for epoch in range(epochs):
-        # Encrypt fresh each epoch if needed 
+        # Encrypt fresh each epoch if needed
         # (often you might just keep your model encrypted throughout,
         #  but here's a place to ensure encryption is set)
         model.encrypt(ctx_training)
 
         # Time the epoch
         t_start = time.time()
-        
+
         # Shuffle data if you like (optional)
         # (requires storing them together or using the same shuffled indices)
         # For simplicity here, we won't shuffle
