@@ -38,7 +38,7 @@ Metrics are the best results obtained during training.
 | LogReg  |  0.66   | 0.1 |
 | EncLogReg |  0.58  | 135 |
 | LinReg    | 2.43    | 0.1|
-| EncLinReg | 2232.43   | 2.92 | 
+| EncLinReg | 2232.43   | 22.00 | 
 
 
 ### Z-score normalization:
@@ -48,7 +48,7 @@ Metrics are the best results obtained during training.
 | LogReg  |  0.65   | 0.1 |
 | EncLogReg |  0.68  | 133 |
 | LinReg    | 0.73    | 0.1|
-| EncLinReg | 2280.2146  | 2.95 | 
+| EncLinReg | 2280.2146  | 21.80 | 
 
 
 ### Min-max normalization:
@@ -57,5 +57,5 @@ Metrics are the best results obtained during training.
 | LogReg  | 0.60 | 0.1 |
 | EncLogReg | 0.60 | 133 |
 | LinReg    | 0.77 | 0.1|
-| EncLinReg | 1.50 | 2.89 |
+| EncLinReg | 1.50 | 21.83 |
 
