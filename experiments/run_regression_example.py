@@ -7,7 +7,6 @@ from regression import (EncryptedLinearRegression, LinReg,
                         train_encrypted_linear_reg, train_linear_reg)
 
 
-
 def run_experiment(normalization_type):
     x_train, y_train, x_test, y_test = get_financial_data(
         standardization=normalization_type
@@ -21,8 +20,8 @@ def run_experiment(normalization_type):
     encrypted_model = EncryptedLinearRegression(x_train.shape[1])
     print("Encrypted Linear Regression")
 
-    poly_mod_degree = 16384
-    coeff_mod_bit_sizes = [60, 40, 40, 60]
+    poly_mod_degree = 8192
+    coeff_mod_bit_sizes = [40, 21, 21, 21, 21, 21, 21, 40]
     # create TenSEALContext
     ctx_training = ts.context(
         ts.SCHEME_TYPE.CKKS, poly_mod_degree, -1, coeff_mod_bit_sizes

@@ -2,7 +2,6 @@ import time
 
 import torch
 
-torch.random.manual_seed(66)
 
 class LinReg(torch.nn.Module):
 
@@ -15,7 +14,7 @@ class LinReg(torch.nn.Module):
         return out
 
 
-def train_linear_reg(model, x_train, y_train, x_test, y_test, lr=0.001, epochs=5):
+def train_linear_reg(model, x_train, y_train, x_test, y_test, lr=0.00001, epochs=5):
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     loss_fn = torch.nn.MSELoss()
     times = []
@@ -28,6 +27,12 @@ def train_linear_reg(model, x_train, y_train, x_test, y_test, lr=0.001, epochs=5
         optimizer.step()
         t_end = time.time()
         times.append(t_end - t_start)
+        # print(x_train)
+
+        # print("PREDICTED")
+        # print(model(x_test))
+        # print("TRUE")
+        # print(y_test)
         print(f"MSE at epoch #{epoch + 1} is {loss_fn(model(x_test), y_test).item()}")
 
     print(f"\nAverage time per epoch: {int(sum(times) / len(times))} seconds")

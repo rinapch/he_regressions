@@ -4,7 +4,6 @@ import numpy as np
 import tenseal as ts
 import torch
 
-torch.random.manual_seed(40)
 
 class EncryptedLinearRegression:
     def __init__(self, n_features):
@@ -119,7 +118,7 @@ def train_encrypted_linear_reg(
     y_test,
     lr=0.001,
     epochs=5,
-    batch_size=100,
+    batch_size=10,
 ):
     times = []
     n_samples = len(enc_x_train)
@@ -133,10 +132,6 @@ def train_encrypted_linear_reg(
         # Time the epoch
         t_start = time.time()
 
-        # Shuffle data if you like (optional)
-        # (requires storing them together or using the same shuffled indices)
-        # For simplicity here, we won't shuffle
-
         # Process each mini-batch
         for i in range(0, n_samples, batch_size):
             x_batch = enc_x_train[i : i + batch_size]
@@ -148,7 +143,7 @@ def train_encrypted_linear_reg(
                 model.backward(enc_x, enc_out, enc_y)
 
             # 2) Now update once using the accumulated gradients
-            model.update_parameters(lr=lr, l2_reg=0.001)
+            model.update_parameters(lr=lr, l2_reg=0.01)
 
         # End-of-epoch time
         t_end = time.time()

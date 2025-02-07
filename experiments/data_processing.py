@@ -53,23 +53,18 @@ def get_financial_data(lookback_years=1, standardization=None):
     all_data = []
     for ticker in tech_list:
         stock = yf.Ticker(ticker)
-        stock_info = stock.history(period="2mo")  # Fetching 1 year of historical data
-        stock_info["Ticker"] = ticker  # Add ticker column
+        stock_info = stock.history(period="1y")  # Fetching 1 year of historical data
         all_data.append(stock_info)
 
     # Concatenating all DataFrames
     full_df = pd.concat(all_data, axis=0)
-    full_df["Ticker"] = full_df["Ticker"].astype("category").cat.codes
+
     full_df = full_df.dropna()
     full_df = full_df.reset_index()
-    # print(full_df.head())
 
-    X = full_df.drop(columns=["Close", "Date", "Volume", "Stock Splits"], axis=1)
-    X = scaler.fit_transform(X)
+    X = full_df.drop(columns=["Date", "Volume", "Stock Splits"], axis=1)
 
-    # print(X.head())
-    y = pd.DataFrame(full_df["Close"])
-    y = scaler.fit_transform(y)
+    print(X.head())
 
     # Apply standardization if specified
     if standardization == "z-score":
@@ -79,11 +74,14 @@ def get_financial_data(lookback_years=1, standardization=None):
     elif standardization is not None:
         raise ValueError(f"Unknown standardization method: {standardization}")
 
-    # Convert to tensors
-    X = torch.tensor(X).float()
-    # print(X[0])
-    y = torch.tensor(y).float()
-    # print(y)
+    y = pd.DataFrame(X["Close"])
+    X = X.drop(columns=["Close"])
 
+    X = torch.tensor(X.values).float()
+
+    y = torch.tensor(y.values).float().view(-1, 1)
+    # print(y)
+    # print(X)
     # Split into train and test sets
+
     return split_train_test(X, y)
